@@ -1,0 +1,12 @@
+# Exported from Render on 2025-07-07T17:19:41Z
+services:
+- type: web
+  name: bingo-bonanza-multiplayer
+  runtime: node
+  repo: https://github.com/A-SagarReddy/bingo-bonanza-multiplayer
+  plan: free
+  region: oregon
+  buildCommand: npm install
+  startCommand: node multiplayer.js
+  autoDeployTrigger: commit
+version: "1"
