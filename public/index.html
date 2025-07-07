@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bingo Bonanza</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="icon" href="images/bingo.bg.png" type="image/png" />
+
+    <!-- 🎉 Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <!-- ✅ Socket.IO & Game Logic -->
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <script src="script.js" defer></script>
+    <script src="multiplayer.js" defer></script>
+  </head>
+
+  <body class="loaded">
+    <!-- 🔥 Splash Screen (optional) -->
+    <div id="splashScreen" style="display: none"></div>
+
+    <!-- 🌟 Main Game Card -->
+    <div class="hd">
+      <div class="card active">
+        <h1>BINGO BONANZA</h1>
+        <p class="tagline">Play solo or challenge a friend!</p>
+
+        <!-- 🎮 Game Mode Selection -->
+        <div class="game-modes">
+          <button id="pc">Single Player</button>
+          <button id="multi">Multiplayer</button>
+          <button id="tutorial">Tutorial</button>
+        </div>
+
+        <!-- 🔗 Multiplayer Options -->
+        <div id="multiplayer-options" style="display: none">
+          <h3>Multiplayer Setup</h3>
+          <div class="multi-buttons">
+            <button id="createRoomPrompt">Create Game</button>
+            <button id="joinRoomPrompt">Join Game</button>
+            <button id="backToMenu" class="exit-button">⬅ Back</button>
+          </div>
+
+          <!-- ✅ Input area for name/code -->
+          <div id="inputArea" style="margin-top: 10px"></div>
+
+          <!-- ✅ Connection / error messages -->
+          <div id="roomTimeoutMsg" style="margin-top: 10px; color: red"></div>
+          <div
+            id="connectionStatus"
+            style="margin-top: 8px; font-size: 0.9em; color: #333"
+          ></div>
+        </div>
+
+        <!-- 📘 Quick Guide -->
+        <div class="how-to-play">
+          <h2>Quick Guide</h2>
+          <ul>
+            <li>Select Single or Multiplayer mode</li>
+            <li>Mark numbers on your grid</li>
+            <li>Each full line earns a B-I-N-G-O letter</li>
+            <li>Complete BINGO to win!</li>
+          </ul>
+        </div>
+
+        <!-- 📊 Player Stats -->
+        <div class="quick-stats">
+          <div class="stat-item">
+            <span class="stat-label">Games Played:</span>
+            <span id="gamesPlayed">0</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Win Streak:</span>
+            <span id="winStreak">0</span>
+          </div>
+        </div>
+
+        <!-- 📎 Footer -->
+        <footer>
+          <p>&copy; 2025 Bingo Bonanza. All rights reserved.</p>
+          <nav>
+            <a href="#rules">Rules</a> | <a href="#privacy">Privacy</a> |
+            <a href="#contact">Contact</a>
+          </nav>
+        </footer>
+      </div>
+    </div>
+
+    <!-- 📖 Tutorial Modal -->
+    <div id="tutorialModal" class="modal" style="display: none">
+      <div class="modal-content">
+        <h2>How to Play Bingo</h2>
+        <ol>
+          <li>Choose a game mode</li>
+          <li>Mark your numbers as you play</li>
+          <li>Complete lines to earn B-I-N-G-O letters</li>
+          <li>Spell BINGO to win!</li>
+        </ol>
+        <button id="closeTutorial">Close</button>
+      </div>
+    </div>
+
+    <!-- ✅ Sounds -->
+    <audio id="winSound" src="sounds/win sound.mp3" preload="auto"></audio>
+    <audio id="loseSound" src="sounds/lose sound.mp3" preload="auto"></audio>
+    <audio id="bonusSound" src="sounds/bonus sound.mp3" preload="auto"></audio>
+  </body>
+</html>
