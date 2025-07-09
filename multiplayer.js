@@ -160,7 +160,7 @@ function initMultiplayer(numbers) {
   const exitBtn = document.createElement("button");
   exitBtn.textContent = "Exit to Home";
   exitBtn.classList.add("exit-button");
-  exitBtn.onclick = () => (location.href = "/");
+  exitBtn.onclick = () => (location.href = `${window.location.origin}/bingo-bonanza-multiplayer/`);
   gameContainer.appendChild(exitBtn);
 
   document.body.appendChild(gameContainer);
