@@ -1,0 +1,16 @@
+# Dependencies
+node_modules/
+
+# Local editor/project settings
+.qodo/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# Mac system files
+.DS_Store
+
+# Environment variables
+.env
