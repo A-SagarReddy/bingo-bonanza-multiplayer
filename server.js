@@ -17,8 +17,8 @@ const io = new Server(server, {
 
 const PORT = process.env.PORT || 3000;
 
-// ✅ Serve static files (public)
-app.use(express.static(__dirname));
+// ✅ Serve static files if you have any (optional)
+app.use(express.static(path.join(__dirname, "public")));
 
 // ✅ Store active rooms
 const rooms = {};
@@ -38,6 +38,7 @@ io.on("connection", (socket) => {
       host: socket,
       hostName: playerName,
       guest: null,
+      currentTurn: "host", // Host starts
     };
 
     socket.join(roomCode);
@@ -54,10 +55,12 @@ io.on("connection", (socket) => {
 
       socket.join(roomCode);
 
+      // Send starting turn to both players
       io.to(roomCode).emit("startGame", {
         roomCode,
         hostName: room.hostName,
         guestName: room.guestName,
+        currentTurn: room.currentTurn,
       });
 
       console.log(`✅ ${playerName} joined room ${roomCode}`);
@@ -67,9 +70,19 @@ io.on("connection", (socket) => {
     }
   });
 
-  // ✅ Relay moves
+  // ✅ Relay moves & switch turns
   socket.on("moveMade", ({ roomCode, number }) => {
-    socket.to(roomCode).emit("moveMade", { number });
+    const room = rooms[roomCode];
+    if (!room) return;
+
+    // Switch turn on server
+    room.currentTurn = room.currentTurn === "host" ? "guest" : "host";
+
+    // Notify both players with the next turn info
+    io.to(roomCode).emit("moveMade", {
+      number,
+      nextTurn: room.currentTurn,
+    });
   });
 
   // ✅ Relay game over
@@ -77,7 +90,7 @@ io.on("connection", (socket) => {
     socket.to(roomCode).emit("gameOver");
   });
 
-  // ✅ Handle rematch request → send to opponent
+  // ✅ Handle rematch request
   socket.on("requestRematch", ({ roomCode }) => {
     const room = rooms[roomCode];
     if (!room) return;
@@ -102,6 +115,7 @@ io.on("connection", (socket) => {
     else if (room.guest === socket) requester = room.host;
 
     if (accepted) {
+      room.currentTurn = "host"; // Always reset to host
       io.to(roomCode).emit("startRematch");
       console.log(`✅ Rematch accepted in room ${roomCode}`);
     } else {
