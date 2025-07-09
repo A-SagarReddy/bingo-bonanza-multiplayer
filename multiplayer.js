@@ -1,6 +1,6 @@
 // ✅ FILE: multiplayer.js
 
-const socket = io();
+const socket = io("https://api-bingo-bonanza-multiplayer.onrender.com");
 
 let isHost = false;
 let myTurn = false;
