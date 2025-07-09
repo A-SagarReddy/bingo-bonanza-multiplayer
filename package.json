@@ -1,17 +1,23 @@
 {
+  "name": "bingo-bonanza-multiplayer",
+  "version": "1.0.0",
+  "description": "Multiplayer Bingo Bonanza Game with Express & Socket.io",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "bingo",
+    "multiplayer",
+    "socket.io",
+    "express"
+  ],
+  "author": "A-SagarReddy",
+  "license": "ISC",
   "dependencies": {
+    "dotenv": "^17.1.0",
     "express": "^5.1.0",
     "socket.io": "^4.8.1"
-  },
-  "name": "js",
-  "version": "1.0.0",
-  "main": "multiplayer.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": ""
+  }
 }
