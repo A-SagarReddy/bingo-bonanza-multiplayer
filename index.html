@@ -17,8 +17,11 @@
   </head>
 
   <body class="loaded">
-    <!-- 🔥 Splash Screen (optional) -->
-    <div id="splashScreen" style="display: none"></div>
+    <!-- 🌟 Splash Screen -->
+    <!-- 🔥 Splash Screen -->
+    <div id="splashScreen">
+      <h1>Loading...</h1>
+    </div>
 
     <!-- 🌟 Main Game Card -->
     <div class="hd">
@@ -105,5 +108,12 @@
     <audio id="winSound" src="sounds/win sound.mp3" preload="auto"></audio>
     <audio id="loseSound" src="sounds/lose sound.mp3" preload="auto"></audio>
     <audio id="bonusSound" src="sounds/bonus sound.mp3" preload="auto"></audio>
+
+    <script>
+      window.addEventListener("load", () => {
+        const splash = document.getElementById("splashScreen");
+        splash.style.animation = "fadeSplash 0.7s ease-in-out forwards";
+      });
+    </script>
   </body>
 </html>
