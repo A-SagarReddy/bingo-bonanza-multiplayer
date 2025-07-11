@@ -395,7 +395,6 @@ footer nav a {
   color: #2a5d8f;
   text-align: center;
 }
-
 /* Splash Screen */
 #splashScreen {
   position: fixed;
@@ -408,8 +407,8 @@ footer nav a {
   font-size: 2em;
   font-weight: bold;
   color: #4a90e2;
-  animation: fadeSplash 0.7s ease-in-out forwards;
 }
+
 @keyframes fadeSplash {
   0% {
     opacity: 1;
