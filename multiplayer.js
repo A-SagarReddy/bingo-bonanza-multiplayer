@@ -1,4 +1,4 @@
-// ✅ FILE: multiplayer.js
+// ✅ FINAL multiplayer.js
 
 const socket = io("https://api-bingo-bonanza-multiplayer.onrender.com");
 
@@ -14,10 +14,9 @@ let cells = [];
 // ✅ Start game
 socket.on("startGame", ({ roomCode: rc, currentTurn }) => {
   roomCode = rc;
-  myTurn =
-    (isHost && currentTurn === "host") || (!isHost && currentTurn === "guest");
+  myTurn = (isHost && currentTurn === "host") || (!isHost && currentTurn === "guest");
   const numbers = shuffle(Array.from({ length: 25 }, (_, i) => i + 1));
-  initMultiplayer(numbers);
+  buildBoard(numbers);
 });
 
 // ✅ Rematch start
@@ -44,7 +43,7 @@ socket.on("rematchRequested", () => {
   acceptBtn.onclick = () => {
     socket.emit("rematchResponse", { roomCode, accepted: true });
     removeResultBoxes();
-    resetBoard();
+    resetBoard(isHost ? "host" : "guest");
   };
   box.appendChild(acceptBtn);
 
@@ -103,7 +102,7 @@ document.getElementById("joinRoomPrompt").onclick = () => {
   };
 };
 
-// ✅ Util: shuffle array
+// ✅ Shuffle helper
 function shuffle(array) {
   for (let i = array.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -112,9 +111,11 @@ function shuffle(array) {
   return array;
 }
 
-// ✅ Init multiplayer board
-function initMultiplayer(numbers) {
+// ✅ Build initial board
+function buildBoard(numbers) {
   document.querySelector(".hd").style.display = "none";
+
+  if (gameContainer) gameContainer.remove();
 
   gameContainer = document.createElement("div");
   gameContainer.classList.add("game-container");
@@ -125,10 +126,7 @@ function initMultiplayer(numbers) {
 
   tracker = document.createElement("div");
   tracker.classList.add("bingo-tracker");
-  tracker.innerHTML = "B I N G O"
-    .split(" ")
-    .map((l) => `<span class="bingo-letter">${l}</span>`)
-    .join("");
+  tracker.innerHTML = "B I N G O".split(" ").map(l => `<span class="bingo-letter">${l}</span>`).join("");
   gameContainer.appendChild(tracker);
 
   lastCalled = document.createElement("p");
@@ -145,7 +143,10 @@ function initMultiplayer(numbers) {
   gameContainer.appendChild(grid);
 
   cells = [];
-  numbers.forEach((num) => {
+  clearedLines = 0;
+  gameOver = false;
+
+  numbers.forEach(num => {
     const cell = document.createElement("div");
     cell.classList.add("bingo-cell");
     cell.textContent = num;
@@ -154,7 +155,6 @@ function initMultiplayer(numbers) {
 
     cell.addEventListener("click", () => {
       if (gameOver || !myTurn || cell.classList.contains("marked")) return;
-
       markCell(cell, true);
       socket.emit("moveMade", { roomCode, number: num });
       myTurn = false;
@@ -165,9 +165,7 @@ function initMultiplayer(numbers) {
   const exitBtn = document.createElement("button");
   exitBtn.textContent = "Exit to Home";
   exitBtn.classList.add("exit-button");
-  exitBtn.onclick = () =>
-    (location.href =
-      "https://a-sagarreddy.github.io/bingo-bonanza-multiplayer/");
+  exitBtn.onclick = () => location.href = "https://a-sagarreddy.github.io/bingo-bonanza-multiplayer/";
   gameContainer.appendChild(exitBtn);
 
   document.body.appendChild(gameContainer);
@@ -175,6 +173,8 @@ function initMultiplayer(numbers) {
 
 // ✅ Mark a cell
 function markCell(cell, isOwn) {
+  if (gameOver) return;
+
   cell.classList.add("marked");
   lastCalled.textContent = `Last Number: ${cell.textContent}`;
 
@@ -187,21 +187,18 @@ function markCell(cell, isOwn) {
     if (bonusSound) bonusSound.play();
   }
 
-  if (clearedLines === 5) {
+  if (clearedLines >= 5) {
     gameOver = true;
     socket.emit("gameOver", roomCode);
-    showResultBox(
-      isOwn ? "🎉 You got BINGO!" : "😢 Opponent got BINGO!",
-      isOwn
-    );
+    showResultBox(isOwn ? "🎉 You got BINGO!" : "😢 Opponent got BINGO!", isOwn);
   }
 }
 
-// ✅ When move happens: trust server's nextTurn
+// ✅ When move happens
 socket.on("moveMade", ({ number, nextTurn }) => {
   if (gameOver) return;
 
-  const cell = cells.find((c) => Number(c.textContent) === number);
+  const cell = cells.find(c => Number(c.textContent) === number);
   if (cell && !cell.classList.contains("marked")) {
     markCell(cell, false);
   }
@@ -223,22 +220,22 @@ socket.on("opponentLeft", () => {
   showResultBox("🚫 Opponent left the game.", false, true);
 });
 
-// ✅ Helpers for counting BINGO lines
+// ✅ Count BINGO lines
 function countLines() {
-  const isMarked = (i) => cells[i].classList.contains("marked");
+  const isMarked = i => cells[i].classList.contains("marked");
   let lines = 0;
   for (let r = 0; r < 5; r++) {
-    if ([0, 1, 2, 3, 4].every((c) => isMarked(r * 5 + c))) lines++;
+    if ([0, 1, 2, 3, 4].every(c => isMarked(r * 5 + c))) lines++;
   }
   for (let c = 0; c < 5; c++) {
-    if ([0, 1, 2, 3, 4].every((r) => isMarked(r * 5 + c))) lines++;
+    if ([0, 1, 2, 3, 4].every(r => isMarked(r * 5 + c))) lines++;
   }
   if ([0, 6, 12, 18, 24].every(isMarked)) lines++;
   if ([4, 8, 12, 16, 20].every(isMarked)) lines++;
   return lines;
 }
 
-// ✅ Update B I N G O letters
+// ✅ Update B I N G O
 function updateTracker(count) {
   document.querySelectorAll(".bingo-letter").forEach((el, i) => {
     el.classList.toggle("struck", i < count);
@@ -248,22 +245,14 @@ function updateTracker(count) {
 // ✅ Reset board for rematch
 function resetBoard(currentTurn) {
   const numbers = shuffle(Array.from({ length: 25 }, (_, i) => i + 1));
-  cells.forEach((cell, idx) => {
-    cell.textContent = numbers[idx];
-    cell.classList.remove("marked");
-  });
-  clearedLines = 0;
-  gameOver = false;
-  lastCalled.textContent = "Last Number: -";
-  updateTracker(0);
-  myTurn =
-    (isHost && currentTurn === "host") || (!isHost && currentTurn === "guest");
+  buildBoard(numbers);
+  myTurn = (isHost && currentTurn === "host") || (!isHost && currentTurn === "guest");
   status.textContent = myTurn ? "Your turn!" : "Opponent's turn";
 }
 
 // ✅ Remove result boxes
 function removeResultBoxes() {
-  document.querySelectorAll(".result-box").forEach((el) => el.remove());
+  document.querySelectorAll(".result-box").forEach(el => el.remove());
 }
 
 // ✅ Show result box
@@ -297,9 +286,7 @@ function showResultBox(msg, isWinner = false, opponentLeft = false) {
 
   const exitBtn = document.createElement("button");
   exitBtn.textContent = "Exit to Home";
-  exitBtn.onclick = () =>
-    (location.href =
-      "https://a-sagarreddy.github.io/bingo-bonanza-multiplayer/");
+  exitBtn.onclick = () => location.href = "https://a-sagarreddy.github.io/bingo-bonanza-multiplayer/";
   result.appendChild(exitBtn);
 
   document.body.appendChild(result);
