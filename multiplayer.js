@@ -21,9 +21,9 @@ socket.on("startGame", ({ roomCode: rc, currentTurn }) => {
 });
 
 // ✅ Rematch start
-socket.on("startRematch", () => {
+socket.on("startRematch", ({ currentTurn }) => {
   removeResultBoxes();
-  resetBoard();
+  resetBoard(currentTurn);
 });
 
 // ✅ Rematch declined
@@ -166,7 +166,8 @@ function initMultiplayer(numbers) {
   exitBtn.textContent = "Exit to Home";
   exitBtn.classList.add("exit-button");
   exitBtn.onclick = () =>
-    (location.href = "https://a-sagarreddy.github.io/bingo-bonanza-multiplayer/");
+    (location.href =
+      "https://a-sagarreddy.github.io/bingo-bonanza-multiplayer/");
   gameContainer.appendChild(exitBtn);
 
   document.body.appendChild(gameContainer);
@@ -245,7 +246,7 @@ function updateTracker(count) {
 }
 
 // ✅ Reset board for rematch
-function resetBoard() {
+function resetBoard(currentTurn) {
   const numbers = shuffle(Array.from({ length: 25 }, (_, i) => i + 1));
   cells.forEach((cell, idx) => {
     cell.textContent = numbers[idx];
@@ -255,7 +256,8 @@ function resetBoard() {
   gameOver = false;
   lastCalled.textContent = "Last Number: -";
   updateTracker(0);
-  myTurn = isHost;
+  myTurn =
+    (isHost && currentTurn === "host") || (!isHost && currentTurn === "guest");
   status.textContent = myTurn ? "Your turn!" : "Opponent's turn";
 }
 
@@ -296,7 +298,8 @@ function showResultBox(msg, isWinner = false, opponentLeft = false) {
   const exitBtn = document.createElement("button");
   exitBtn.textContent = "Exit to Home";
   exitBtn.onclick = () =>
-    (location.href = "https://a-sagarreddy.github.io/bingo-bonanza-multiplayer/");
+    (location.href =
+      "https://a-sagarreddy.github.io/bingo-bonanza-multiplayer/");
   result.appendChild(exitBtn);
 
   document.body.appendChild(result);
