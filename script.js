@@ -91,7 +91,8 @@ function startSinglePlayerGame() {
 
   let currentPlayer = "user";
   let gameOver = false;
-  let cleared = 0;
+  let playerLines = 0;
+  let computerLines = 0;
 
   function countLines() {
     const isMarked = (i) => cells[i].classList.contains("marked");
@@ -114,9 +115,7 @@ function startSinglePlayerGame() {
     document.querySelectorAll(".bingo-letter").forEach((el, i) => {
       if (!el.classList.contains("struck") && i < count) {
         el.classList.add("struck");
-        if (bonusSound) {
-          bonusSound.play().catch(() => {});
-        }
+        if (bonusSound) bonusSound.play().catch(() => {});
       }
     });
   }
@@ -174,12 +173,12 @@ function startSinglePlayerGame() {
       cell.classList.add("marked");
       const lines = countLines();
 
-      if (lines > cleared) {
+      if (lines > playerLines) {
         updateTracker(lines);
-        cleared = lines;
+        playerLines = lines;
       }
 
-      if (cleared === 5) {
+      if (playerLines === 5) {
         showResultBox("🎉 You got BINGO!");
         gameOver = true;
         return;
@@ -194,13 +193,13 @@ function startSinglePlayerGame() {
           const choice = unmarked[Math.floor(Math.random() * unmarked.length)];
           choice.classList.add("marked");
 
-          const newLines = countLines();
-          if (newLines > cleared) {
-            updateTracker(newLines);
-            cleared = newLines;
+          const compLines = countLines();
+          if (compLines > computerLines) {
+            updateTracker(compLines);
+            computerLines = compLines;
           }
 
-          if (cleared === 5) {
+          if (computerLines === 5) {
             showResultBox("😢 Better Luck Next Time");
             gameOver = true;
             return;
