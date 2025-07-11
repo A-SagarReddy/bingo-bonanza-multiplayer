@@ -115,8 +115,9 @@ io.on("connection", (socket) => {
     else if (room.guest === socket) requester = room.host;
 
     if (accepted) {
-      room.currentTurn = "host"; // Always reset to host
-      io.to(roomCode).emit("startRematch");
+      // Pick who starts: host starts again or random
+      const currentTurn = Math.random() < 0.5 ? "host" : "guest";
+      io.to(roomCode).emit("startRematch", { currentTurn });
       console.log(`✅ Rematch accepted in room ${roomCode}`);
     } else {
       if (requester) requester.emit("rematchDeclined");
